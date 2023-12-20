@@ -35,7 +35,11 @@ source: |
   and any($free_email_providers, strings.icontains(body.current_thread.text, .))
   
   // and that email doesn't match the sender domain
-  and all(body.links, .href_url.domain.root_domain != sender.email.domain.domain)
+  and (
+    all(body.links, .href_url.domain.root_domain != sender.email.domain.domain)
+    or sender.email.domain.root_domain in $free_email_providers
+  )
+
 
 tags: 
   - "Vertical: EDU"
