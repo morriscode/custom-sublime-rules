@@ -1,0 +1,49 @@
+name: "Scam: Piano Giveaway "
+description: "This rule is designed to identify and mitigate a specific type of fraudulent activity commonly targeted at educational institutions. This rule operates by analyzing incoming email content for certain characteristics indicative of a scam involving the offer of a free piano, often framed within the context of downsizing or a giveaway. "
+type: "rule"
+severity: ""
+source: |
+  type.inbound
+  and any(ml.nlu_classifier(body.current_thread.text).entities,
+          .name == "greeting"
+  )
+  and 3 of (
+    strings.ilike(body.current_thread.text, '*piano*'),
+    strings.ilike(body.current_thread.text, '*downsizing*'),
+    strings.ilike(body.current_thread.text, '*give away*'),
+    strings.ilike(body.current_thread.text, '*baby grand*'),
+    strings.ilike(body.current_thread.text, '*kindly*'),
+    strings.ilike(body.current_thread.text, '*private email*'),
+    strings.ilike(body.current_thread.text, '*swift response*')
+  )
+  
+  // all attachments are images or there's no attachments
+  and (
+    (
+      length(attachments) > 0
+      and all(attachments, .file_type in $file_types_images)
+    )
+    or length(attachments) == 0
+  )
+  
+  // there's an email in the body
+  and regex.contains(body.current_thread.text,
+                     "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+  )
+  
+  // and it's likely a freemail
+  and any($free_email_providers, strings.icontains(body.current_thread.text, .))
+  
+  // and that email doesn't match the sender domain
+  and all(body.links, .href_url.domain.root_domain != sender.email.domain.domain)
+
+tags: 
+  - "Vertical: EDU"
+attack_types:
+  - "BEC/Fraud"
+tactics_and_techniques:
+  - "Free email provider"
+detection_methods:
+  - "Content analysis"
+  - "Natural Language Understanding"
+  - "Sender analysis"
