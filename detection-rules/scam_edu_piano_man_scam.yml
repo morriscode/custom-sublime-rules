@@ -41,6 +41,7 @@ tags:
   - "Vertical: EDU"
 attack_types:
   - "BEC/Fraud"
+  - "PIANO SCAM"
 tactics_and_techniques:
   - "Free email provider"
 detection_methods:
