@@ -39,11 +39,3 @@ source: |
 
 tags: 
   - "Vertical: EDU"
-attack_types:
-  - "BEC/Fraud"
-tactics_and_techniques:
-  - "Free email provider"
-detection_methods:
-  - "Content analysis"
-  - "Natural Language Understanding"
-  - "Sender analysis"
